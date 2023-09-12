@@ -34,6 +34,22 @@ const updateTabFilePath = (newFilePath) => {
 const updateTabName = (newName) => {
   if (activeTab) {
     activeTab.textContent = newName;
+    const closeButton = document.createElement("button");
+    closeButton.className = "close-tab-button";
+    closeButton.textContent = "×";
+    closeButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const parentTab = event.target.closest('.tab');
+      const tabId = parentTab.id;
+      const contentId = `tab-content-${tabId.split('-')[1]}`;
+      parentTab.remove();
+      document.getElementById(contentId).remove();
+      if (activeTab === parentTab) {
+        activeTab = null;
+      }
+    });
+
+    activeTab.appendChild(closeButton);
   }
 };
 
