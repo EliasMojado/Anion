@@ -1,4 +1,6 @@
 const { ipcRenderer } = require('electron');
+const path = require('path');
+
 
 ipcRenderer.on('request-editor-content', (event) => {
   const content = getEditorContent(); // Assuming getEditorContent is defined in this scope
@@ -14,6 +16,11 @@ ipcRenderer.on('update-tab-name', (event, newName) => {
   updateTabName(newName);
 });
 
+ipcRenderer.on('populate-editor-content', (event, content, filePath) => {
+  console.log(content, filePath);
+  window.addTab(filePath, content);  // Create a new tab and populate it with content and filePath
+});
+
 ipcRenderer.on('update-tab-filePath', (event, newFilePath) => {
   updateTabFilePath(newFilePath);
 });
@@ -24,7 +31,6 @@ const updateTabFilePath = (newFilePath) => {
     activeTab.filePath = newFilePath;
   }
 };
-
 
 const updateTabName = (newName) => {
   if (activeTab) {
@@ -54,13 +60,13 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Function to add a new tab
-  const addTab = (filePath=null) => {
+  const addTab = (filePath=null, content='') => {
     tabCounter++;
     const tab = document.createElement("div");
     tab.className = "tab";
     tab.id = `tab-${tabCounter}`;
-    tab.textContent = `Untitled ${tabCounter}`;
-    tab.filePath = filePath;
+    tab.textContent = filePath ? path.basename(filePath) : `Untitled ${tabCounter}`; // Set the tab name based on filePath if available
+    tab.filePath = filePath; // Set the filePath attribute
     tab.addEventListener("click", () => activateTab(tab));
 
     const closeButton = document.createElement("button");
@@ -97,6 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("Editor initialized");
       editor.setTheme("ace/theme/twilight");
       editor.session.setMode("ace/mode/javascript");
+      editor.setValue(content);
     } else {
       console.log("Editor failed to initialize");
     }
@@ -106,6 +113,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   addTabButton.addEventListener("click", addTab);
   addTab();
+
+  window.addTab = addTab;
 });
 
 // Expose the getEditorContent function to the main process

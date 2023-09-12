@@ -25,16 +25,22 @@ const createFileMenu = () => {
           label: 'Open File',
           accelerator: 'CmdOrCtrl+O',
           click: async () => {
-            // Your code for opening a file
             const { filePaths } = await dialog.showOpenDialog({
               properties: ['openFile']
             });
-
+        
             if (filePaths.length > 0) {
-
+              const filePath = filePaths[0];
+              const content = fs.readFileSync(filePath, 'utf-8');
+              const win = BrowserWindow.getFocusedWindow();
+              console.log(content);
+              win.webContents.send('populate-editor-content', content, filePath);  // Include filePath here
+              const fileName = path.basename(filePath);
+              win.webContents.send('update-tab-name', fileName);
+              win.webContents.send('update-tab-filePath', filePath);
             }
           }
-        },
+        },        
         {
           label: 'Save',
           accelerator: 'CmdOrCtrl+S',
