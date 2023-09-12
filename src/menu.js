@@ -53,7 +53,7 @@ const createFileMenu = () => {
               if (!filePath) {
                 const { filePath: newFilePath } = await dialog.showSaveDialog({
                   filters: [
-                    { name: 'Bogo Document', extensions: ['bogo'] },
+                    { name: 'ION Document', extensions: ['ion'] },
                   ],
                 });
                 filePath = newFilePath;
@@ -79,7 +79,7 @@ const createFileMenu = () => {
             // Your code for saving a file
             const { filePath } = await dialog.showSaveDialog({
               filters: [
-                { name: 'Bogo Document', extensions: ['bogo']},
+                { name: 'ION Document', extensions: ['ion']},
               ]
             });
 

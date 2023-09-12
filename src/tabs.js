@@ -27,7 +27,6 @@ ipcRenderer.on('update-tab-filePath', (event, newFilePath) => {
 
 const updateTabFilePath = (newFilePath) => {
   if (activeTab) {
-    console.log(newFilePath);
     activeTab.filePath = newFilePath;
   }
 };
