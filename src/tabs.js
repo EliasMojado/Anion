@@ -5,6 +5,11 @@ ipcRenderer.on('request-editor-content', (event) => {
   ipcRenderer.send('editor-content-response', content);
 });
 
+ipcRenderer.on('request-current-tab-filePath', (event) => {
+  const filePath = activeTab ? activeTab.filePath : null;
+  ipcRenderer.send('current-tab-filePath-response', filePath);
+});
+
 ipcRenderer.on('update-tab-name', (event, newName) => {
   updateTabName(newName);
 });
@@ -15,6 +20,7 @@ ipcRenderer.on('update-tab-filePath', (event, newFilePath) => {
 
 const updateTabFilePath = (newFilePath) => {
   if (activeTab) {
+    console.log(newFilePath);
     activeTab.filePath = newFilePath;
   }
 };

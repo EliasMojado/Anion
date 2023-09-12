@@ -39,26 +39,33 @@ const createFileMenu = () => {
           label: 'Save',
           accelerator: 'CmdOrCtrl+S',
           click: async () => {
-
-            const { filePath } = await dialog.showSaveDialog({
-              filters: [
-                { name: 'Bogo Document', extensions: ['bogo']},
-              ]
+            const win = BrowserWindow.getFocusedWindow();
+            win.webContents.send('request-current-tab-filePath');
+            ipcMain.once('current-tab-filePath-response', async (event, existingFilePath) => {
+              let filePath = existingFilePath;
+        
+              if (!filePath) {
+                const { filePath: newFilePath } = await dialog.showSaveDialog({
+                  filters: [
+                    { name: 'Bogo Document', extensions: ['bogo'] },
+                  ],
+                });
+                filePath = newFilePath;
+              }
+        
+              if (filePath) {
+                win.webContents.filePath = filePath;  // Set custom property
+                win.webContents.send('request-editor-content');
+                ipcMain.once('editor-content-response', (event, content) => {
+                  fs.writeFileSync(filePath, content);  // Use custom property
+                  const fileName = path.basename(filePath); // Assuming you've required the 'path' module
+                  win.webContents.send('update-tab-name', fileName);
+                  win.webContents.send('update-tab-filePath', filePath);
+                });
+              }
             });
-
-            if (filePath) {
-              const win = BrowserWindow.getFocusedWindow();
-              win.webContents.filePath = filePath;  // Set custom property
-              win.webContents.send('request-editor-content');
-              ipcMain.once('editor-content-response', (event, content) => {
-                fs.writeFileSync(event.sender.filePath, content);  // Use custom property
-                const fileName = path.basename(event.sender.filePath); // Assuming you've required the 'path' module
-                win.webContents.send('update-tab-name', fileName);
-                win.webContents.send('update-tab-filePath', event.sender.filePath);
-              });
-            }
           }
-        },
+        },        
         {
           label: 'Save as',
           accelerator: 'CmdOrCtrl+Shift+S',
