@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const tab = document.createElement("div");
     tab.className = "tab";
     tab.id = `tab-${tabCounter}`;
-    tab.textContent = filePath ? path.basename(filePath) : `Untitled ${tabCounter}`; // Set the tab name based on filePath if available
+    tab.textContent = `Untitled ${tabCounter}`; // Set the tab name based on filePath if available
     tab.filePath = filePath; // Set the filePath attribute
     tab.addEventListener("click", () => activateTab(tab));
 
