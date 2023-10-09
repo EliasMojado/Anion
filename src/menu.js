@@ -4,8 +4,14 @@ const fs = require('fs');
 
 // IPC listener for receiving editor content from renderer process
 ipcMain.on('editor-content-response', (event, content) => {
-  // Your code to save the content to a file
-  fs.writeFileSync(event.sender.filePath, content);
+  console.log("try4");
+  const win = BrowserWindow.getFocusedWindow();
+  if (win && win.webContents.filePath) {
+    fs.writeFileSync(win.webContents.filePath, content);
+    const fileName = path.basename(win.webContents.filePath);
+    win.webContents.send('update-tab-name', fileName);
+    win.webContents.send('update-tab-filePath', win.webContents.filePath);
+  }
 });
 
 const createFileMenu = () => {
@@ -45,12 +51,14 @@ const createFileMenu = () => {
           label: 'Save',
           accelerator: 'CmdOrCtrl+S',
           click: async () => {
+            console.log("try0");
             const win = BrowserWindow.getFocusedWindow();
             win.webContents.send('request-current-tab-filePath');
             ipcMain.once('current-tab-filePath-response', async (event, existingFilePath) => {
               let filePath = existingFilePath;
         
               if (!filePath) {
+                console.log("try1");
                 const { filePath: newFilePath } = await dialog.showSaveDialog({
                   filters: [
                     { name: 'ION Document', extensions: ['ion'] },
@@ -60,6 +68,7 @@ const createFileMenu = () => {
               }
         
               if (filePath) {
+                console.log("try2");
                 win.webContents.filePath = filePath;  // Set custom property
                 win.webContents.send('request-editor-content');
                 ipcMain.once('editor-content-response', (event, content) => {

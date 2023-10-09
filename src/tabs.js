@@ -1,7 +1,6 @@
 const { ipcRenderer } = require('electron');
 const path = require('path');
 
-
 ipcRenderer.on('request-editor-content', (event) => {
   const content = getEditorContent(); // Assuming getEditorContent is defined in this scope
   ipcRenderer.send('editor-content-response', content);
@@ -71,6 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
     tab.classList.add("active");
     document.getElementById(`tab-content-${tab.id.split('-')[1]}`).classList.add("active");
     activeTab = tab;
+    console.log(typeof tab.filePath, tab.filePath);
     ipcRenderer.send('active-tab-filePath', tab.filePath);  // Send filePath to main process
   };
 
@@ -80,6 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const tab = document.createElement("div");
     tab.className = "tab";
     tab.id = `tab-${tabCounter}`;
+    // tab.textContent = filePath ? path.basename(filePath) : `Untitled ${tabCounter}`;
     tab.textContent = `Untitled ${tabCounter}`; // Set the tab name based on filePath if available
     tab.filePath = filePath; // Set the filePath attribute
     tab.addEventListener("click", () => activateTab(tab));
